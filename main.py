@@ -1,5 +1,6 @@
 
 import paramiko
+import threading
 
 class user_interface:
 	def __init__(self):
@@ -9,15 +10,37 @@ class remote_host:
 	def __init__(self):
 		self.client = paramiko.SSHClient()
 		self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+		
 	def connection(self, host, user, secret, port = 22):
 		self.client.connect(hostname = host, username = user, password = secret, port = port)
 		self.transport = paramiko.Transport((host, port))
 		self.transport.connect(username = user, password = secret)
 		self.sftp = paramiko.SFTPClient.from_transport(self.transport)
+		
+		self.shell = self.client.invoke_shell()
+		self.continue_shell_session = True
+		self.shell_output_thread = threading.Thread(target = self.shell_output)
+		self.shell_output_thread.daemon = True
+		self.shell_output_thread.start()
+		
 	def command(self, request):
 		stdin, stdout, stderr = self.client.exec_command(request)
 		data = stdout.read() + stderr.read()
+		data = data.decode('utf-8')
 		return data
+		
+	def command_shell(self):
+		while self.continue_shell_session:
+			cmd = input()
+			self.shell.send(cmd + '\n')
+			
+	def shell_output(self):
+		while self.continue_shell_session:
+			data = bytes()
+			while self.shell.recv_ready():
+				data += self.shell.recv(1024)
+			print(data.decode('utf-8')[:-1], end = '')
+
 	def get_file(self, remotepath, localpath):
 		sftp.get(remotepath, localpath)
 	def put_file(self, remotepath, localpath):
@@ -52,8 +75,8 @@ if __name__ == '__main__':
 	
 	target_host = remote_host()
 	target_host.connection(host, user, secret)
-	print(target_host.command('pwd'))
-	target_host.disconnection()
 	
+	target_host.command_shell()
+	#target_host.disconnection()
 
 	print('Ok.')
