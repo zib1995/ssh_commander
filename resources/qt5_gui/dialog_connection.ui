@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>366</width>
-    <height>137</height>
+    <width>414</width>
+    <height>151</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,6 +20,29 @@
    <string>Connection</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_password">
+     <property name="text">
+      <string>Password</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" colspan="3">
+    <widget class="QLineEdit" name="lineEdit_password">
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="echoMode">
+      <enum>QLineEdit::Password</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" colspan="3">
+    <widget class="QLineEdit" name="lineEdit_host"/>
+   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="label_host">
      <property name="font">
@@ -38,40 +61,30 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1" colspan="3">
-    <widget class="QLineEdit" name="lineEdit_host"/>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_password">
+   <item row="3" column="3">
+    <widget class="QPushButton" name="pushButton_cancel">
      <property name="text">
-      <string>Password</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      <string>Cancel</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1" colspan="3">
-    <widget class="QLineEdit" name="lineEdit_password">
-     <property name="autoFillBackground">
-      <bool>false</bool>
-     </property>
-     <property name="echoMode">
-      <enum>QLineEdit::Password</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
+   <item row="3" column="2">
     <widget class="QPushButton" name="pushButton_connect">
      <property name="text">
       <string>Connect</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="3">
-    <widget class="QPushButton" name="pushButton_cancel">
+   <item row="1" column="1" colspan="3">
+    <widget class="QLineEdit" name="lineEdit_user"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_user">
      <property name="text">
-      <string>Cancel</string>
+      <string>User</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
    </item>

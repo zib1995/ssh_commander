@@ -7,11 +7,50 @@ import dialog_connection
 import main_window
 import time
 
-class user_interface:
+class UserInterface:
 	def __init__(self):
-		print('No implemented.')
+		self.app = QtWidgets.QApplication(sys.argv)
+		self.MainWindow = QtWidgets.QMainWindow()
+		self.ui_main_window = main_window.Ui_MainWindow()
+		self.ui_main_window.setupUi(self.MainWindow)
+		self.ui_main_window.statusbar.showMessage('Start.')
+		self.define_reactions()
+		self.MainWindow.show()
+		self.reaction_to_menu_connect()
 
-class remote_host:
+	def start(self):
+		sys.exit(self.app.exec_())
+
+	def get_terminal(self):
+		return self.ui_main_window.textEdit_terminal
+
+	def define_reactions(self):
+		self.ui_main_window.actionConnect.triggered.connect(self.reaction_to_menu_connect)
+		self.ui_main_window.actionQuit.triggered.connect(self.app.quit)
+
+	def reaction_to_menu_connect(self):
+		self.DialogConnection = QtWidgets.QDialog()
+		self.ui_dialog_connection = dialog_connection.Ui_Dialog_connection()
+		self.ui_dialog_connection.setupUi(self.DialogConnection)
+		self.ui_dialog_connection.pushButton_connect.clicked.connect(self.reaction_to_dialog_connection_connect)
+		self.ui_dialog_connection.pushButton_cancel.clicked.connect(self.DialogConnection.close)
+		self.DialogConnection.exec_()
+
+	def reaction_to_dialog_connection_connect(self):
+		host = self.ui_dialog_connection.lineEdit_host.text()
+		user = self.ui_dialog_connection.lineEdit_user.text()
+		secret = self.ui_dialog_connection.lineEdit_password.text()
+
+		self.target_host = RemoteHost(terminal = self.get_terminal())
+		self.target_host.connection(host, user, secret)
+		self.target_host.command_shell()
+		#target_host.disconnection()
+
+		self.DialogConnection.close()
+
+
+
+class RemoteHost:
 	def __init__(self, terminal):
 		self.client = paramiko.SSHClient()
 		self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -66,7 +105,7 @@ class remote_host:
 		self.transport.close()
 		self.client.close()
 
-class file_manager:
+class FileManager:
 	def get_view(self, source):
 		file_list = []
 		print('No implemented.')
@@ -81,25 +120,13 @@ class file_manager:
 		print('No implemented.')
 
 if __name__ == '__main__':
-	app = QtWidgets.QApplication(sys.argv)
-	MainWindow = QtWidgets.QMainWindow()
-	ui_main_window = main_window.Ui_MainWindow()
-	ui_main_window.setupUi(MainWindow)
-	MainWindow.show()
 
 	#Test host:
 
-	host = '192.168.33.33'
-	user = 'vagrant'
-	secret = 'vagrant'
-	port = 22
+	#host = '192.168.33.33'
+	#user = 'vagrant'
+	#secret = 'vagrant'
+	#port = 22
 
-	target_host = remote_host(terminal = ui_main_window.textEdit_terminal)
-
-	target_host.connection(host, user, secret)
-	
-	target_host.command_shell()
-	#target_host.disconnection()
-
-	print('Ok.')
-	sys.exit(app.exec_())
+	user_interface = UserInterface()
+	user_interface.start()
