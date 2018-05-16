@@ -3,6 +3,7 @@ import sys
 import paramiko
 import threading
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
 import dialog_connection
 import main_window
 import time
@@ -17,6 +18,7 @@ class UserInterface:
 		self.define_reactions()
 		self.MainWindow.show()
 		self.reaction_to_menu_connect()
+		self.command = ''
 
 	def start(self):
 		sys.exit(self.app.exec_())
@@ -27,6 +29,7 @@ class UserInterface:
 	def define_reactions(self):
 		self.ui_main_window.actionConnect.triggered.connect(self.reaction_to_menu_connect)
 		self.ui_main_window.actionQuit.triggered.connect(self.app.quit)
+		self.ui_main_window.textEdit_terminal.cursorPositionChanged.connect(self.reaction_to_enter)
 
 	def reaction_to_menu_connect(self):
 		self.DialogConnection = QtWidgets.QDialog()
@@ -42,11 +45,27 @@ class UserInterface:
 		secret = self.ui_dialog_connection.lineEdit_password.text()
 
 		self.target_host = RemoteHost(terminal = self.get_terminal())
+
+		# Test host:
+		#host = '192.168.33.33'
+		#user = 'vagrant'
+		#secret = 'vagrant'
+
 		self.target_host.connection(host, user, secret)
 		self.target_host.command_shell()
 		#target_host.disconnection()
 
 		self.DialogConnection.close()
+
+	def reaction_to_enter(self):
+		text = self.ui_main_window.textEdit_terminal.toPlainText()
+		line = text.split('\n')[-1]
+		#print(line)
+		if line == '':
+			command = self.command.split('$')[1]
+			self.target_host.shell.send(command + '\n')
+		self.command = line
+
 
 
 
@@ -73,11 +92,11 @@ class RemoteHost:
 		return data
 
 	def command_shell(self):
-		self.command_shell_thread = threading.Thread(target = self.commands)
+		#self.command_shell_thread = threading.Thread(target = self.commands)
 		self.shell_output_thread = threading.Thread(target = self.shell_output)
-		self.command_shell_thread.daemon = True
+		#self.command_shell_thread.daemon = True
 		self.shell_output_thread.daemon = True
-		self.command_shell_thread.start()
+		#self.command_shell_thread.start()
 		self.shell_output_thread.start()
 
 	def commands(self):
@@ -91,15 +110,15 @@ class RemoteHost:
 			while self.shell.recv_ready():
 				data += self.shell.recv(1024)
 			data_text = data.decode('utf-8')[:-1]
-			print(data_text, end = '')
+			#print(data_text, end = '')
 			if data_text != '':
 				self.terminal.append(data_text)
 				time.sleep(1)
 
 	def get_file(self, remotepath, localpath):
-		sftp.get(remotepath, localpath)
+		self.sftp.get(remotepath, localpath)
 	def put_file(self, remotepath, localpath):
-		sftp.put(remotepath, localpath)
+		self.sftp.put(remotepath, localpath)
 	def disconnection(self):
 		self.sftp.close()
 		self.transport.close()
@@ -120,13 +139,5 @@ class FileManager:
 		print('No implemented.')
 
 if __name__ == '__main__':
-
-	#Test host:
-
-	#host = '192.168.33.33'
-	#user = 'vagrant'
-	#secret = 'vagrant'
-	#port = 22
-
 	user_interface = UserInterface()
 	user_interface.start()

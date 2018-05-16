@@ -25,7 +25,18 @@
      <widget class="QListWidget" name="listWidget_local"/>
     </item>
     <item row="1" column="0" colspan="3">
-     <widget class="QTextEdit" name="textEdit_terminal"/>
+     <widget class="QTextEdit" name="textEdit_terminal">
+      <property name="font">
+       <font>
+        <family>Courier</family>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="cursor" stdset="0">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
